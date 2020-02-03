@@ -25,7 +25,13 @@
 
             let resultat = `Arealet er ${areal(længde,bredde )} kvadratmeter`;
 
-            console.log(resultat);
+            if (areal(længde, bredde) <= 0) {
+                console.log("ugyldig");
+
+            } else {
+
+                console.log(resultat);
+            }
         }
 
         function areal(l, b) {
