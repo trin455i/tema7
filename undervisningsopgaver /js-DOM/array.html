@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style>
+        body {
+            color: burlywood;
+        }
+
+        #display {
+            width: 20vw;
+            height: 20vw;
+            border: 1px solid silver;
+            margin: 7vw;
+            padding: 1wv;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="display"></div>
+    <script>
+        let playlist = ["Sound of music", "dansing in the rain", "what a wonderful world"];
+        playlist.forEach(sang => {
+            document.querySelector("#display").innerHTML += `${sang}<br>`;
+        })
+
+    </script>
+</body>
+
+</html>
