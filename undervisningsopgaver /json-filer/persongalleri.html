@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Personliste</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            width: 100%;
+
+        }
+
+        .personliste {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+            background: #f5d5d5;
+
+        }
+
+        article {
+            border: 1px;
+            padding: 10px;
+        }
+
+        @media screen and (min-width: 768px) {}
+    </style>
+</head>
+
+<body>
+    <section class="personliste"></section>
+    <template>
+        <article class="personer">
+            <h2></h2>
+            <img src="">
+            <p class="alder"> alder:</p>
+            <p class="job"> job:</p>
+            <p class="hobby"></p>
+
+        </article>
+
+    </template>
+
+    <script>
+        let personer = [];
+        document.addEventListener("DOMContentLoaded", start);
+
+        const endpoint = "https://spreadsheets.google.com/feeds/list/1XWWbfWszD7f4jHqp51V_oT3pkHuR-ceEUw4YtrvK7F0/od6/public/values?alt=json";
+
+
+        function start() {
+            hentData();
+            console.log("hej");
+        }
+
+        async function hentData() {
+            const response = await fetch(endpoint);
+            console.log(response);
+            personer = await response.json();
+            console.log(personer);
+            visPersoner();
+        }
+
+        function visPersoner() {
+            const personliste = document.querySelector(".personliste");
+            const template = document.querySelector("template");
+
+            personer.feed.entry.forEach(hverPerson => {
+                let klon = template.cloneNode(true).content;
+                klon.querySelector("h2").textContent = hverPerson.gsx$navn.$t;
+
+                klon.querySelector("img").src = hverPerson.gsx$billede.$t;
+
+                klon.querySelector(".alder").textContent += hverPerson.gsx$alder.$t;
+
+                klon.querySelector(".job").textContent += hverPerson.gsx$job.$t;
+
+                klon.querySelector(".hobby").src = hverPerson.gsx$hobby.$t;
+                personliste.appendChild(klon);
+
+            })
+        }
+    </script>
+</body></html>
