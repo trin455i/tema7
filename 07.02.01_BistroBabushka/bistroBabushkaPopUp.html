@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="da">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    <link rel="stylesheet" href="">
+    <link href="https://fonts.googleapis.com/css?family=Righteous&display=swap" rel="stylesheet">
+    <header>
+        <header>
+
+            <h1> Bistro Babushka</h1>
+
+        </header>
+    </header>
+    <nav>
+        <button class="filter valgt" data-kategori="alle">Alle</button>
+        <button class="filter" data-kategori="forretter">Forretter</button>
+        <button class="filter " data-kategori="hovedretter">Hovedretter</button>
+        <button class="filter" data-kategori="desserter">Desserter</button>
+        <button class="filter" data-kategori="sideorders">Sideorders</button>
+        <button class="filter" data-kategori="drikkevarer">Drikkevarer
+        </button>
+    </nav>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        img {
+            max-width: 100%;
+        }
+
+        .madListe {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-gap: 5px;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 10px;
+            background: #d9d0c6;
+        }
+
+        h1 {
+            text-align: center;
+            color: #574d46;
+            font-size: 5vw;
+            font-family: 'Righteous', cursive;
+        }
+
+        h2 {
+            font-size: 1.5vw;
+        }
+
+        p {
+            color: #413f3b;
+        }
+
+        article {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+
+        article .person {
+            margin: 1vw;
+            width: 20vw;
+            padding: 3px;
+        }
+
+        article h1 {
+            font-size: 3vw;
+        }
+
+        nav {
+            text-align: center;
+        }
+
+        button {
+            padding: 5px;
+            margin: 0.5px;
+            border: 2px solid #d9d0c6;
+        }
+
+        footer {
+            text-align: center;
+        }
+
+        .valgt {
+            opacity: 50%;
+            background-color: #efd6c3;
+            //*background-color: #b15959;*//
+        }
+
+        #detalje {
+            position: fixed;
+            top: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #detalje .mad {
+            margin: 1em;
+            padding: 1em;
+            background-color: rgba(0, 0, 0, 0.8);
+            width: 50vw;
+            height: 60vh;
+
+        }
+
+        #detalje button {
+            font-size: 1.5em;
+            padding: 0vw;
+            cursor: pointer;
+        }
+
+        #detalje img {
+            max-width: 50%;
+        }
+
+
+        #detalje h2,
+        p {
+            color: white;
+        }
+
+        #person {
+            margin: 3em;
+            padding: 2em;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        .skjul {
+            display: none;
+        }
+
+
+        @media screen and (min-width:768px) {}
+    </style>
+</head>
+
+<body>
+
+    <section id="detalje" class="skjul">
+        <button id="luk">X</button>
+        <article class="mad">
+            <h2 class="navn"></h2>
+            <img src="" alt="">
+            <p class="langinfo"></p>
+            <p class="pris">Pris: </p>
+        </article>
+    </section>
+
+
+    <section class="madListe">
+    </section>
+
+    <template>
+        <article class="person">
+            <h2></h2>
+            <img src="">
+            <p>Pris: </p>
+            <p>Kategori: </p>
+            <p></p>
+        </article>
+    </template>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", start);
+        const endpoint = ("https://spreadsheets.google.com/feeds/list/17Dd7DvkPaFamNUdUKlrFgnH6POvBJXac7qyiS6zNRw0/od6/public/values?alt=json");
+
+        let mad = [];
+        let filter = "alle";
+
+        const detalje = document.querySelector("#detalje");
+
+        const madListe = document.querySelector(".madListe");
+        const template = document.querySelector("template");
+
+        function start() {
+            hentJson();
+            addEventToButtons();
+        }
+
+        function addEventToButtons() {
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.addEventListener("click", filtrering);
+            })
+        }
+
+
+        function filtrering() {
+            console.log("filter");
+            filter = this.dataset.kategori;
+            document.querySelectorAll(".filter").forEach(elm => {
+                elm.classList.remove("valgt");
+            })
+            this.classList.add("valgt");
+            visMad();
+        }
+
+        async function hentJson() {
+            const jsonData = await fetch(endpoint);
+            console.log("jsonData");
+            mad = await jsonData.json();
+            console.log(mad);
+            visMad();
+        }
+
+
+        function visMad() {
+            madListe.innerHTML = "";
+
+            mad.feed.entry.forEach(mad => {
+                if (filter == "alle" || filter == mad.gsx$kategori.$t) {
+                    let klon = template.cloneNode(true).content;
+                    klon.querySelector("h2").textContent = mad.gsx$navn.$t;
+                    klon.querySelector("p").textContent += mad.gsx$pris.$t;
+                    klon.querySelector("p+p").textContent += mad.gsx$kategori.$t;
+                    klon.querySelector("p+p+p").textContent += mad.gsx$kort.$t;
+                    //klon.querySelector("img").src = mad.gsx$billede.$t;
+                    klon.querySelector("img").src = "imgs/small/" + mad.gsx$billede.$t + "-sm.jpg";
+                    klon.querySelector(".person").addEventListener("click", () => {
+                        visDetalje(mad);
+                    });
+
+                    madListe.appendChild(klon);
+                }
+            })
+        }
+
+        function visDetalje(mad) {
+
+            //() =>detalje.classList.add("skjul"));
+
+            document.querySelector("#detalje").classList.remove("skjul");
+            document.querySelector("#luk").addEventListener("click", skjulDetalje);
+
+            document.querySelector("#detalje h2").textContent = mad.gsx$navn.$t;
+
+            document.querySelector("#detalje img").src = "imgs/large/" + mad.gsx$billede.$t + ".jpg";
+
+            document.querySelector("#detalje p").textContent = mad.gsx$lang.$t;
+
+            document.querySelector("#detalje p+p").textContent = mad.gsx$pris.$t;
+        }
+
+
+        function skjulDetalje() {
+            document.querySelector("#detalje").classList.add("skjul");
+        }
+    </script>
+</body></html>
